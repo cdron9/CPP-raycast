@@ -31,7 +31,7 @@ Player::Player(float startX, float startY) {
     rotSpeed = 3.0f;
 }
 
-Player::handleInput(const bool* keys, float deltaTime, const int map[][MAP_SIZE]) {
+void Player::handleInput(const bool* keys, float deltaTime, const int map[][MAP_SIZE]) {
     if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_S]) {
         float moveDir = keys[SDL_SCANCODE_W] ? 1.0f : -1.0f;
         float stepX = dirX * speed * moveDir * deltaTime;
@@ -67,6 +67,7 @@ int map[MAP_SIZE][MAP_SIZE] = {
 };
 
 int main() {
+    Player player(100.0f, 100.0f);
     // initialise SDL
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = SDL_CreateWindow("CPP Raycast", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
@@ -101,9 +102,62 @@ int main() {
         float pCX = player.x + 4;
         float pCY = player.y + 4;
 
-    }
-}
-    
+        for (int i = 0; i < SCREEN_WIDTH; i++) {
+            float cameraX = 2.0f * i / (float)SCREEN_WIDTH - 1.0f;
+            float rayDX = player.dirX + player.planeX * cameraX;
+            float rayDY = player.dirY + player.planeY * cameraX;
 
+            int mX = (int)(pCX / TILE_SIZE), mY = (int)(pCY / TILE_SIZE);
+            float dDX = (rayDX == 0) ? 1e30 : fabsf(1 / rayDX);
+            float dDY = (rayDY == 0) ? 1e30 : fabsf(1 / rayDY);
+
+            float sDX, sDY;
+            int stepX, stepY;
+
+            if (rayDX < 0) { stepX = -1; sDX = (pCX / TILE_SIZE - mX) * dDX; }
+            else { stepX = 1; sDX = (mX + 1.0f - pCX / TILE_SIZE) * dDX; }
+            if (rayDY < 0) { stepY = -1; sDY = (pCY / TILE_SIZE - mY) * dDY; }
+            else { stepY = 1; sDY = (mY + 1.0f - pCY / TILE_SIZE) * dDY; }
+
+            int hit = 0, side;
+            while (hit == 0) {
+                if (sDX < sDY) { sDX += dDX; mX += stepX; side = 0; }
+                else { sDY += dDY; mY += stepY; side = 1; }
+                if (mX < 0 || mX >= MAP_SIZE || mY < 0 || mY >= MAP_SIZE) break;
+                if (map[mY][mX] > 0) hit = 1;
+            }
+
+            float pWD = (side == 0) ? (sDX - dDX) : (sDY - dDY);
+            if (pWD < 0.1f) pWD = 0.1f;
+            float h = SCREEN_HEIGHT / pWD;
+
+            float intensity = 1.0f / (1.0f + pWD * pWD * 0.03f);
+            Uint8 r = (Uint8)(255 * intensity);
+            if (side == 1) r *= 0.7; // Side shading
+
+            SDL_SetRenderDrawColor(renderer, r, 0, 0, 255);
+            SDL_FRect slice = {(float)i, (SCREEN_HEIGHT - h) / 2, 1, h};
+            SDL_RenderFillRect(renderer, &slice);
+        }
+
+        float ms = 0.12f, mt = TILE_SIZE * ms, mar = 20.0f;
+        for (int y = 0; y < MAP_SIZE; y++) {
+            for (int x = 0; x < MAP_SIZE; x++) {
+                if (map[y][x] > 0) {
+                    SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
+                    SDL_FRect w = {mar + x * mt, mar + y * mt, mt, mt};
+                    SDL_RenderFillRect(renderer, &w);
+                }
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+        SDL_FRect mp = {mar + player.x * ms - 4, mar + player.y * ms - 4, 7, 7};
+        SDL_RenderFillRect(renderer, &mp);
+
+        SDL_RenderPresent(renderer);
+    }
+    SDL_Quit();
+    return 0;
+}
 
 
