@@ -39,6 +39,16 @@ void Player::handleInput(const bool* keys, float deltaTime, const int map[][MAP_
         if (map[(int)((y+4)/TILE_SIZE)][(int)((x+4+stepX)/TILE_SIZE)] == 0) x += stepX;
         if (map[(int)((y+4+stepY)/TILE_SIZE)][(int)((x+4)/TILE_SIZE)] == 0) y += stepY;
     }
+    if (keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_D]) {
+        float rotDir = keys[SDL_SCANCODE_A] ? -1.0f : 1.0f;
+        float rot = rotDir * rotSpeed * deltaTime;
+        float oldDirX = dirX;
+        dirX = dirX * cosf(rot) - dirY * sinf(rot);
+        dirY = oldDirX * sinf(rot) + dirY * cosf(rot);
+        float oldPlaneX = planeX;
+        planeX = planeX * cosf(rot) - planeY * sinf(rot);
+        planeY = oldPlaneX * sinf(rot) + planeY * cosf(rot);
+    }
 }
 
 
