@@ -26,7 +26,7 @@ The core DDA raycasting algorithm, map layout, rendering, minimap, and wall shad
 
 - DDA raycasting with correct perspective projection (no fisheye)
 - Distance-based wall shading with side-face darkening (70% brightness on Y-axis hits)
-- Smooth movement via `std::chrono` delta time (rotation currently broken — see Known Issues)
+- Smooth movement and rotation via `std::chrono` delta time
 - Collision detection against the tile map
 - Minimap overlay in the top-left corner
 - `Player` class encapsulating state and input handling
@@ -34,20 +34,14 @@ The core DDA raycasting algorithm, map layout, rendering, minimap, and wall shad
 
 ---
 
-## Known Issues
-
-> ⚠️ **Rotation is currently broken.** `A` and `D` do not rotate the player. The rotation logic exists in the game loop but is not functioning correctly — this is a known bug and the next thing to fix.
-
----
-
 ## Controls
 
-| Key | Action | Status |
-|-----|--------|--------|
-| `W` | Move forward | ✅ Working |
-| `S` | Move backward | ✅ Working |
-| `A` | Rotate left | ❌ Broken |
-| `D` | Rotate right | ❌ Broken |
+| Key | Action |
+|-----|--------|
+| `W` | Move forward |
+| `S` | Move backward |
+| `A` | Rotate left |
+| `D` | Rotate right |
 
 ---
 
@@ -174,4 +168,3 @@ The map is a 20×20 grid — `1` = wall, `0` = open space. Edit the `map` array 
 ## License
 
 MIT — do whatever you want with it.
-
