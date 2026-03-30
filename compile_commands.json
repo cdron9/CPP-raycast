@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "file": "main.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-Wall",
+      "-O2",
+      "-I/opt/homebrew/include",
+      "main.cpp",
+      "-o",
+      "raycast"
+    ],
+    "directory": "/Users/callum/projects/cppraycaster",
+    "output": "raycast"
+  }
+]
